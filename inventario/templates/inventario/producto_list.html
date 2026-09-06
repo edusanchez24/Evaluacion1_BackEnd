@@ -2,17 +2,47 @@
 {% extends 'inventario/base.html' %}
 {% block title %}Listado{% endblock %}
 {% block content %}
-<h1>Productos</h1>
-<ul>
-    {% for p in object_list %}
-    <li>
-        <a href="{% url 'producto_detail' p.pk %}">{{ p.nombre }}</a>
-        — ${{ p.precio }} — stock: {{ p.stock }}
-        [<a href="{% url 'producto_update' p.pk %}">Editar</a>]
-        [<a href="{% url 'producto_delete' p.pk %}">Eliminar</a>]
-    </li>
-    {% empty %}
-    <li>No hay productos.</li>
-    {% endfor %}
-</ul>
+<section aria-labelledby="titulo-productos">
+    <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <p class="mb-2 text-sm font-semibold text-sky-800">Catalogo</p>
+            <h1 id="titulo-productos" class="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Productos</h1>
+        </div>
+        <a href="{% url 'producto_create' %}" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5" aria-hidden="true"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            Anadir producto
+        </a>
+    </div>
+    {% if object_list %}
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Lista de productos">
+        {% for p in object_list %}
+        <li class="group flex min-h-52 flex-col rounded-2xl border border-white/70 bg-white/60 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:bg-white/75 hover:shadow-[0_16px_38px_rgba(15,23,42,0.13)]">
+            <div class="mb-5 flex items-start justify-between gap-3">
+                <span class="inline-flex items-center rounded-lg bg-sky-100/85 px-2.5 py-1 text-xs font-bold text-sky-900">{{ p.stock }} en stock</span>
+                <span class="text-lg font-bold tabular-nums text-slate-950">${{ p.precio }}</span>
+            </div>
+            <h2 class="text-lg font-bold tracking-tight text-slate-950"><a href="{% url 'producto_detail' p.pk %}" class="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700">{{ p.nombre }}</a></h2>
+            <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{{ p.descripcion|default:"Sin descripcion disponible." }}</p>
+            <div class="mt-auto flex items-center justify-between pt-5">
+                <a href="{% url 'producto_detail' p.pk %}" class="text-sm font-semibold text-sky-800 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">Ver detalle<span aria-hidden="true"> &rarr;</span></a>
+                <div class="flex gap-1">
+                    <a href="{% url 'producto_update' p.pk %}" class="inline-flex size-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-white hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700" aria-label="Editar {{ p.nombre }}" title="Editar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m16.86 3.49 3.65 3.65M4.5 19.5l3.99-.89L19.73 7.37a2.58 2.58 0 0 0-3.65-3.65L4.84 14.96 4.5 19.5Z" /></svg>
+                    </a>
+                    <a href="{% url 'producto_delete' p.pk %}" class="inline-flex size-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-rose-50 hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700" aria-label="Eliminar {{ p.nombre }}" title="Eliminar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9 14.4 19.2m-4.8 0L9.26 9m9.15-3.21c.34.05.68.1 1.02.16m-1.02-.16-1.07 13.92a2.25 2.25 0 0 1-2.24 2.08H8.9a2.25 2.25 0 0 1-2.24-2.08L5.59 5.79m12.82 0a48.1 48.1 0 0 0-12.82 0m0 0L5.5 3.88m1.09 1.91L7.02 3.3A2.25 2.25 0 0 1 9.24 1.5h5.52a2.25 2.25 0 0 1 2.22 1.8l.43 2.49" /></svg>
+                    </a>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="rounded-2xl border border-dashed border-slate-300 bg-white/55 px-6 py-16 text-center shadow-sm backdrop-blur-xl">
+        <div class="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-sky-100 text-sky-800" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-8.25A3.375 3.375 0 0 0 4.5 11.625v5.25a3.375 3.375 0 0 0 3.375 3.375h4.875M8.25 5.25h7.5M12 2.25v3" /></svg></div>
+        <h2 class="text-lg font-bold text-slate-950">Aun no hay productos</h2>
+        <p class="mt-2 text-sm text-slate-600">Crea el primer producto para empezar a gestionar el inventario.</p>
+    </div>
+    {% endif %}
+</section>
 {% endblock %}

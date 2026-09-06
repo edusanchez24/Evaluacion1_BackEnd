@@ -6,14 +6,50 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Inventario{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --font-sans: "SF Pro Display", "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
+        }
+
+        @layer base {
+            body {
+                @apply min-h-screen bg-slate-950 font-sans text-slate-900 antialiased;
+                background-image:
+                    radial-gradient(circle at 12% 8%, rgba(56, 189, 248, .30), transparent 26rem),
+                    radial-gradient(circle at 88% 20%, rgba(129, 140, 248, .24), transparent 28rem),
+                    linear-gradient(135deg, #e0f2fe 0%, #eef2ff 48%, #f8fafc 100%);
+                background-attachment: fixed;
+            }
+        }
+    </style>
 </head>
 
-<body>
-    <nav>
-        <a href="{% url 'producto_list' %}">Productos</a>
-        <a href="{% url 'producto_create' %}">Nuevo</a>
-    </nav>
-    <main>
+<body class="selection:bg-sky-200 selection:text-slate-950">
+    <a href="#contenido" class="sr-only z-50 rounded-lg bg-slate-950 px-4 py-3 font-semibold text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4">Saltar al contenido</a>
+    <header class="px-4 pt-4 sm:px-6 sm:pt-6">
+        <nav aria-label="Navegacion principal" class="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-white/60 bg-white/65 px-3 py-3 shadow-[0_12px_36px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:px-4">
+            <a href="{% url 'producto_list' %}" class="flex items-center gap-3 rounded-xl px-2 py-1.5 font-semibold tracking-tight text-slate-950 transition hover:bg-white/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">
+                <span class="flex size-9 items-center justify-center rounded-xl bg-slate-950 text-white shadow-sm" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.07a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6.27A2.25 2.25 0 0 1 6 4.02h4.08M15.75 3.52H20.5m0 0v4.75m0-4.75L12 12.02" /></svg>
+                </span>
+                <span>Inventario</span>
+            </a>
+            <div class="flex items-center gap-1 sm:gap-2">
+                <a href="{% url 'producto_list' %}" class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white/75 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3.75h19.5v16.5H2.25V3.75ZM2.25 9h19.5M8.25 9v11.25" /></svg>
+                    <span class="hidden sm:inline">Productos</span>
+                    <span class="sr-only sm:hidden">Productos</span>
+                </a>
+                <a href="{% url 'producto_create' %}" class="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-5" aria-hidden="true"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    <span class="hidden sm:inline">Nuevo producto</span>
+                    <span class="sr-only sm:hidden">Nuevo producto</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+    <main id="contenido" class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
         {% block content %}{% endblock %}
     </main>
 </body>

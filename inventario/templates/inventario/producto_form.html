@@ -1,9 +1,27 @@
 <!-- inventario/templates/inventario/producto_form.html -->
 {% extends 'inventario/base.html' %}
+{% block title %}Producto{% endblock %}
 {% block content %}
-<h1>Producto</h1>
-<form method="post">{% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-</form>
+<section class="mx-auto max-w-2xl" aria-labelledby="titulo-producto">
+  <div class="mb-7">
+    <a href="{% url 'producto_list' %}" class="inline-flex items-center gap-2 rounded-lg text-sm font-semibold text-sky-800 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>Volver a productos</a>
+    <h1 id="titulo-producto" class="mt-4 text-3xl font-bold tracking-tight text-slate-950">Producto</h1>
+  </div>
+  <form method="post" class="rounded-2xl border border-white/70 bg-white/65 p-6 shadow-[0_16px_42px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-8">{% csrf_token %}
+    {% if form.non_field_errors %}<div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="space-y-5">
+      {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-semibold text-slate-800">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="mt-2 text-sm font-medium text-rose-700">{{ field.errors|striptags }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="mt-8 flex flex-wrap-reverse items-center justify-between gap-3 border-t border-slate-200/80 pt-5">
+      <a href="{% url 'producto_list' %}" class="inline-flex min-h-11 items-center px-3 text-sm font-semibold text-slate-700 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">Cancelar</a>
+      <button type="submit" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 4.5v.75A2.25 2.25 0 0 1 14.25 7.5h-4.5A2.25 2.25 0 0 1 7.5 5.25V4.5m9 0A2.25 2.25 0 0 0 14.25 2.25h-4.5A2.25 2.25 0 0 0 7.5 4.5m9 0h.75A2.25 2.25 0 0 1 19.5 6.75v12A2.25 2.25 0 0 1 17.25 21h-10.5a2.25 2.25 0 0 1-2.25-2.25v-12A2.25 2.25 0 0 1 6.75 4.5h.75" /></svg>Guardar producto</button>
+    </div>
+  </form>
+</section>
 {% endblock %}

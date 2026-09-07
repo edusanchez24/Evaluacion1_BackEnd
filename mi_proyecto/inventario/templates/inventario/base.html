@@ -46,10 +46,16 @@
                     <span class="hidden sm:inline">Nuevo producto</span>
                     <span class="sr-only sm:hidden">Nuevo producto</span>
                 </a>
+                <a href="{% url 'venta_list' %}" class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white/75 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="size-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5h16.5v15H3.75v-15Zm0 4.5h16.5M8.25 4.5v15" /></svg>
+                    <span class="hidden sm:inline">Ventas</span>
+                    <span class="sr-only sm:hidden">Ventas</span>
+                </a>
             </div>
         </nav>
     </header>
     <main id="contenido" class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        {% if messages %}<div class="mx-auto mb-6 max-w-6xl space-y-2">{% for message in messages %}<div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">{{ message }}</div>{% endfor %}</div>{% endif %}
         {% block content %}{% endblock %}
     </main>
 </body>

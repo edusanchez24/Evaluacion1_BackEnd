@@ -1,0 +1,15 @@
+{% extends 'inventario/base.html' %}
+{% block title %}Nueva venta{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl" aria-labelledby="titulo-venta">
+  <div class="mb-7"><a href="{% url 'venta_list' %}" class="text-sm font-semibold text-sky-800 hover:text-sky-950">Volver a ventas</a><h1 id="titulo-venta" class="mt-4 text-3xl font-bold tracking-tight text-slate-950">Registrar venta</h1><p class="mt-2 text-slate-600">El stock se descuenta automáticamente al guardar.</p></div>
+  <form method="post" class="rounded-2xl border border-white/70 bg-white/65 p-6 shadow-[0_16px_42px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-8">{% csrf_token %}
+    {% if form.non_field_errors %}<div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="grid gap-5 sm:grid-cols-2">
+      {% for field in form %}<div class="{% if field.name == 'cliente_habitual' %}sm:col-span-2{% endif %}"><label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-semibold text-slate-800">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="mt-2 text-sm font-medium text-rose-700">{{ field.errors|striptags }}</p>{% endif %}</div>{% endfor %}
+    </div>
+    <p class="mt-5 text-sm leading-6 text-slate-600">Si no guardas al cliente como habitual, solo se conservará el RUT asociado a esta venta.</p>
+    <div class="mt-8 flex items-center justify-between gap-3 border-t border-slate-200/80 pt-5"><a href="{% url 'venta_list' %}" class="px-3 text-sm font-semibold text-slate-700">Cancelar</a><button type="submit" class="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">Guardar venta</button></div>
+  </form>
+</section>
+{% endblock %}

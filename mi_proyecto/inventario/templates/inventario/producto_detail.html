@@ -12,6 +12,7 @@
 			</div>
 		</div>
 		<dl class="grid gap-6 p-6 sm:grid-cols-2 sm:p-8">
+			<div class="rounded-xl bg-white/55 p-4"><dt class="text-sm font-medium text-slate-600">Codigo</dt><dd class="mt-1 text-2xl font-bold tracking-tight text-slate-950">{{ object.codigo }}</dd></div>
 			<div class="rounded-xl bg-white/55 p-4"><dt class="text-sm font-medium text-slate-600">Precio</dt><dd class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-slate-950">${{ object.precio }}</dd></div>
 			<div class="rounded-xl bg-white/55 p-4"><dt class="text-sm font-medium text-slate-600">Disponibilidad</dt><dd class="mt-1 text-2xl font-bold tabular-nums tracking-tight text-slate-950">{{ object.stock }} <span class="text-base font-semibold text-slate-600">unidades</span></dd></div>
 			<div class="sm:col-span-2"><dt class="text-sm font-semibold text-slate-800">Descripcion</dt><dd class="mt-2 text-base leading-7 text-slate-600">{{ object.descripcion|default:"Sin descripcion disponible." }}</dd></div>

@@ -22,6 +22,7 @@
                 <span class="text-lg font-bold tabular-nums text-slate-950">${{ p.precio }}</span>
             </div>
             <h2 class="text-lg font-bold tracking-tight text-slate-950"><a href="{% url 'producto_detail' p.pk %}" class="rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700">{{ p.nombre }}</a></h2>
+            <p class="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Codigo: {{ p.codigo }}</p>
             <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{{ p.descripcion|default:"Sin descripcion disponible." }}</p>
             <div class="mt-auto flex items-center justify-between pt-5">
                 <a href="{% url 'producto_detail' p.pk %}" class="text-sm font-semibold text-sky-800 hover:text-sky-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700">Ver detalle<span aria-hidden="true"> &rarr;</span></a>

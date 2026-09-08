@@ -138,21 +138,3 @@ class VentaFlowTests(TestCase):
 		self.assertContains(pagina, 'Luis Soto')
 		self.assertContains(pagina, 'TEC-001 - Teclado')
 
-	def test_rut_de_cliente_habitual_devuelve_sus_datos(self):
-		Cliente.objects.create(
-			rut='88.888.888-8',
-			nombre='Maria Perez',
-			telefono='888888888',
-			direccion='Avenida 2',
-			correo='maria@example.com',
-		)
-
-		respuesta = self.client.get('/clientes/por-rut/?rut=88.888.888-8')
-
-		self.assertJSONEqual(respuesta.content, {
-			'encontrado': True,
-			'nombre': 'Maria Perez',
-			'telefono': '888888888',
-			'direccion': 'Avenida 2',
-			'correo': 'maria@example.com',
-		})

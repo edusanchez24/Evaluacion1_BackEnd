@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.db import transaction
-from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Cliente, Producto, Venta, VentaDetalle
 from .forms import ProductoForm, VentaForm
@@ -57,14 +56,6 @@ def producto_delete(request, pk):
 def venta_list(request):
     ventas = Venta.objects.select_related('cliente').prefetch_related('detalles__producto').order_by('-fecha')
     return render(request, 'inventario/venta_list.html', {'ventas': ventas})
-
-
-def cliente_por_rut(request):
-    rut = request.GET.get('rut', '').strip()
-    cliente = Cliente.objects.filter(rut__iexact=rut).values('nombre', 'telefono', 'direccion', 'correo').first()
-    if cliente is None:
-        return JsonResponse({'encontrado': False})
-    return JsonResponse({'encontrado': True, **cliente})
 
 
 def _venta_carrito(request):

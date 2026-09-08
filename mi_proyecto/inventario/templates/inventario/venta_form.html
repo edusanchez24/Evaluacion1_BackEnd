@@ -28,26 +28,4 @@
   {% if carrito %}<section class="street-panel mt-8 p-6" aria-labelledby="productos-agregados"><div class="flex items-center justify-between gap-3"><h2 id="productos-agregados" class="display-font text-3xl font-bold uppercase tracking-tight text-stone-950">Productos agregados</h2><span class="text-sm font-bold text-stone-600">${{ carrito_total }}</span></div><ul class="mt-4 divide-y-2 divide-stone-200 border-y-2 border-stone-950">{% for item in carrito %}<li class="flex items-center justify-between gap-4 py-3"><span class="font-semibold text-stone-950">{{ item.producto.codigo }} - {{ item.producto.nombre }} <span class="text-sm text-stone-600">x{{ item.cantidad }}</span></span><div class="flex items-center gap-4"><span class="font-bold text-stone-950">${{ item.subtotal }}</span><form method="post">{% csrf_token %}<input type="hidden" name="producto_id" value="{{ item.producto.pk }}"><button type="submit" name="accion" value="eliminar" class="text-sm font-bold text-red-600 hover:text-stone-950">Eliminar</button></form></div></li>{% endfor %}</ul><form method="post" class="mt-5 flex justify-end gap-3">{% csrf_token %}<button type="submit" name="accion" value="limpiar" class="px-3 text-sm font-semibold text-stone-700">Limpiar</button><button type="submit" name="accion" value="confirmar" class="border-2 border-stone-950 bg-lime-300 px-5 py-2.5 text-sm font-bold text-stone-950 hover:bg-white">Confirmar venta</button></form></section>{% endif %}
   {% endif %}
 </section>
-{% if not confirmando %}<script>
-  const rutField = document.getElementById('id_rut_cliente');
-  const habitualField = document.getElementById('id_cliente_habitual');
-  const fields = {
-    nombre: document.getElementById('id_nombre'),
-    telefono: document.getElementById('id_telefono'),
-    direccion: document.getElementById('id_direccion'),
-    correo: document.getElementById('id_correo'),
-  };
-
-  rutField?.addEventListener('blur', async () => {
-    const rut = rutField.value.trim();
-    if (!rut) return;
-    const response = await fetch(`{% url 'cliente_por_rut' %}?rut=${encodeURIComponent(rut)}`);
-    const cliente = await response.json();
-    if (!cliente.encontrado) return;
-    Object.entries(fields).forEach(([name, field]) => {
-      if (field) field.value = cliente[name] || '';
-    });
-    if (habitualField) habitualField.checked = true;
-  });
-</script>{% endif %}
 {% endblock %}

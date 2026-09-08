@@ -1,6 +1,11 @@
 from django import forms
 from .models import Cliente, Producto, Venta
 
+class ProductoChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f'{obj.codigo} - {obj.nombre}'
+
+
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
@@ -36,27 +41,31 @@ class ProductoForm(forms.ModelForm):
         }
 
 
-class VentaForm(forms.ModelForm):
+class VentaForm(forms.Form):
     rut_cliente = forms.CharField(max_length=12, required=True, label='RUT del cliente')
     cliente_habitual = forms.BooleanField(required=False, label='Guardar como cliente habitual')
     nombre = forms.CharField(required=False, max_length=128)
     telefono = forms.CharField(required=False, max_length=30)
     direccion = forms.CharField(required=False, max_length=200)
     correo = forms.EmailField(required=False)
+    producto = ProductoChoiceField(queryset=Producto.objects.all(), label='Producto')
 
-    class Meta:
-        model = Venta
-        fields = ['rut_cliente', 'producto', 'cantidad']
-        widgets = {
-            'rut_cliente': forms.TextInput(attrs={'placeholder': '12.345.678-9', 'autocomplete': 'off'}),
-            'producto': forms.Select(),
-            'cantidad': forms.NumberInput(attrs={'min': '1', 'inputmode': 'numeric'}),
-        }
+    producto = ProductoChoiceField(queryset=Producto.objects.all(), label='Producto')
+    cantidad = forms.IntegerField(
+        min_value=1,
+        error_messages={'min_value': 'La cantidad debe ser al menos 1.'},
+        label='Cantidad',
+        widget=forms.NumberInput(attrs={'min': '1', 'inputmode': 'numeric'}),
+    )
+
+    rut_cliente = forms.CharField(max_length=12, required=True, label='RUT del cliente', widget=forms.TextInput(attrs={'placeholder': '12.345.678-9', 'autocomplete': 'off'}))
 
     def clean(self):
         cleaned_data = super().clean()
         producto = cleaned_data.get('producto')
         cantidad = cleaned_data.get('cantidad')
+        if cantidad is not None and cantidad < 1:
+            self.add_error('cantidad', 'La cantidad debe ser al menos 1.')
         if producto and cantidad and cantidad > producto.stock:
             self.add_error('cantidad', f'El producto solo tiene {producto.stock} unidades disponibles.')
 

@@ -20,11 +20,24 @@ class Cliente(models.Model):
 class Venta(models.Model):
     rut_cliente = models.CharField(max_length=12, null=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True)
-    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
-    cantidad = models.PositiveIntegerField()
     total = models.PositiveIntegerField(default=0)
     fecha = models.DateTimeField(auto_now_add=True)
 
+
+class VentaDetalle(models.Model):
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles')
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+    cantidad = models.PositiveIntegerField()
+    subtotal = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(cantidad__gte=1),
+                name='venta_detalle_cantidad_minima_uno',
+            ),
+        ]
+
     def save(self, *args, **kwargs):
-        self.total = self.cantidad * self.producto.precio
+        self.subtotal = self.cantidad * self.producto.precio
         super().save(*args, **kwargs)

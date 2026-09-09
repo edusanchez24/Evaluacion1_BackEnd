@@ -28,4 +28,29 @@
   {% if carrito %}<section class="street-panel mt-8 p-6" aria-labelledby="productos-agregados"><div class="flex items-center justify-between gap-3"><h2 id="productos-agregados" class="display-font text-3xl font-bold uppercase tracking-tight text-stone-950">Productos agregados</h2><span class="text-sm font-bold text-stone-600">${{ carrito_total }}</span></div><ul class="mt-4 divide-y-2 divide-stone-200 border-y-2 border-stone-950">{% for item in carrito %}<li class="flex items-center justify-between gap-4 py-3"><span class="font-semibold text-stone-950">{{ item.producto.codigo }} - {{ item.producto.nombre }} <span class="text-sm text-stone-600">x{{ item.cantidad }}</span></span><div class="flex items-center gap-4"><span class="font-bold text-stone-950">${{ item.subtotal }}</span><form method="post">{% csrf_token %}<input type="hidden" name="producto_id" value="{{ item.producto.pk }}"><button type="submit" name="accion" value="eliminar" class="text-sm font-bold text-red-600 hover:text-stone-950">Eliminar</button></form></div></li>{% endfor %}</ul><form method="post" class="mt-5 flex justify-end gap-3">{% csrf_token %}<button type="submit" name="accion" value="limpiar" class="px-3 text-sm font-semibold text-stone-700">Limpiar</button><button type="submit" name="accion" value="confirmar" class="border-2 border-stone-950 bg-lime-300 px-5 py-2.5 text-sm font-bold text-stone-950 hover:bg-white">Confirmar venta</button></form></section>{% endif %}
   {% endif %}
 </section>
+{% if not confirmando %}
+<script>
+  // Completa los datos del cliente habitual después de ingresar su RUT.
+  const rutInput = document.getElementById('id_rut_cliente');
+  const habitualInput = document.getElementById('id_cliente_habitual');
+  const clientFields = ['nombre', 'telefono', 'direccion', 'correo'];
+  let lookupTimeout;
+
+  rutInput.addEventListener('input', () => {
+    // El retraso evita enviar una solicitud por cada tecla escrita.
+    window.clearTimeout(lookupTimeout);
+    lookupTimeout = window.setTimeout(async () => {
+      const rut = rutInput.value.trim();
+      if (!rut) return;
+      const response = await fetch(`{% url 'cliente_por_rut' %}?rut=${encodeURIComponent(rut)}`);
+      const cliente = await response.json();
+      if (!cliente.encontrado) return;
+      clientFields.forEach((fieldName) => {
+        document.getElementById(`id_${fieldName}`).value = cliente[fieldName];
+      });
+      habitualInput.checked = true;
+    }, 250);
+  });
+</script>
+{% endif %}
 {% endblock %}

@@ -1,15 +1,31 @@
 from django.contrib import messages
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Cliente, Producto, Venta, VentaDetalle
 from .forms import ProductoForm, VentaForm
 
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_GET
 
 # Create your views here.
 def producto_list(request):
+    # El catálogo filtra en la base de datos para no cargar productos innecesarios en la vista.
+    filtro_stock = request.GET.get('stock', 'todos')
+    filtros_validos = {'todos', 'disponibles', 'no_disponibles'}
+    if filtro_stock not in filtros_validos:
+        filtro_stock = 'todos'
+
     productos = Producto.objects.order_by('nombre')
-    return render(request, 'inventario/producto_list.html', {'object_list': productos})
+    if filtro_stock == 'disponibles':
+        productos = productos.filter(stock__gt=0)
+    elif filtro_stock == 'no_disponibles':
+        productos = productos.filter(stock=0)
+
+    return render(request, 'inventario/producto_list.html', {
+        'object_list': productos,
+        'filtro_stock': filtro_stock,
+    })
 
 def producto_detail(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
@@ -54,8 +70,31 @@ def producto_delete(request, pk):
 
 
 def venta_list(request):
+    # `icontains` permite encontrar ventas escribiendo solo una parte del RUT.
+    rut_busqueda = request.GET.get('rut', '').strip()
     ventas = Venta.objects.select_related('cliente').prefetch_related('detalles__producto').order_by('-fecha')
-    return render(request, 'inventario/venta_list.html', {'ventas': ventas})
+    if rut_busqueda:
+        ventas = ventas.filter(rut_cliente__icontains=rut_busqueda)
+    return render(request, 'inventario/venta_list.html', {
+        'ventas': ventas,
+        'rut_busqueda': rut_busqueda,
+    })
+
+
+@require_GET
+def cliente_por_rut(request):
+    # Este endpoint alimenta el autocompletado del formulario sin exponer datos innecesarios.
+    rut = request.GET.get('rut', '').strip()
+    cliente = Cliente.objects.filter(rut=rut).first()
+    if cliente is None:
+        return JsonResponse({'encontrado': False})
+    return JsonResponse({
+        'encontrado': True,
+        'nombre': cliente.nombre,
+        'telefono': cliente.telefono,
+        'direccion': cliente.direccion,
+        'correo': cliente.correo,
+    })
 
 
 def _venta_carrito(request):
@@ -89,6 +128,7 @@ def venta_create(request):
     accion = request.POST.get('accion') if request.method == 'POST' else None
 
     if request.method == 'POST' and accion == 'agregar':
+        # El carrito y los datos del cliente se conservan en sesión mientras se agregan productos.
         form = VentaForm(request.POST)
         if form.is_valid():
             producto = form.cleaned_data['producto']
@@ -117,6 +157,7 @@ def venta_create(request):
             **_venta_carrito_context(request),
         })
     elif request.method == 'POST' and accion == 'registrar':
+        # La transacción mantiene sincronizados el stock, el detalle y el total de la venta.
         carrito = _venta_carrito(request)
         datos_cliente = request.session.get('venta_datos_cliente', {})
         if not carrito:

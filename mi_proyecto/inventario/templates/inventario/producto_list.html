@@ -13,6 +13,18 @@
             Anadir producto
         </a>
     </div>
+    <!-- El formulario GET permite compartir y conservar el filtro de stock en la URL. -->
+    <form method="get" class="mb-8 flex flex-wrap items-end gap-4 border-2 border-stone-950 bg-[#f8f6ef] p-4 shadow-[4px_4px_0_#1c1c1b]">
+        <div class="min-w-56 flex-1">
+            <label for="filtro-stock" class="mb-2 block text-sm font-bold uppercase tracking-wide text-stone-800">Filtrar por stock</label>
+            <select id="filtro-stock" name="stock" class="w-full">
+                <option value="todos" {% if filtro_stock == 'todos' %}selected{% endif %}>Todos</option>
+                <option value="disponibles" {% if filtro_stock == 'disponibles' %}selected{% endif %}>Disponibles</option>
+                <option value="no_disponibles" {% if filtro_stock == 'no_disponibles' %}selected{% endif %}>No disponibles</option>
+            </select>
+        </div>
+        <button type="submit" class="inline-flex min-h-11 items-center gap-2 border-2 border-stone-950 bg-lime-300 px-4 py-2.5 text-sm font-bold text-stone-950 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-500">Aplicar filtro</button>
+    </form>
     {% if object_list %}
     <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Lista de productos">
         {% for p in object_list %}

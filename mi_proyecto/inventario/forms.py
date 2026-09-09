@@ -42,10 +42,19 @@ class ProductoForm(forms.ModelForm):
 
 
 class VentaForm(forms.Form):
+    # Este formulario concentra los datos de la venta y del cliente ocasional o habitual.
     rut_cliente = forms.CharField(max_length=12, required=True, label='RUT del cliente')
     cliente_habitual = forms.BooleanField(required=False, label='Guardar como cliente habitual')
-    nombre = forms.CharField(required=False, max_length=128)
-    telefono = forms.CharField(required=False, max_length=30)
+    nombre = forms.CharField(
+        required=False,
+        max_length=128,
+        widget=forms.TextInput(attrs={'pattern': r'[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*'}),
+    )
+    telefono = forms.CharField(
+        required=False,
+        max_length=30,
+        widget=forms.TextInput(attrs={'inputmode': 'numeric', 'pattern': r'[0-9]+'}),
+    )
     direccion = forms.CharField(required=False, max_length=200)
     correo = forms.EmailField(required=False)
     producto = ProductoChoiceField(queryset=Producto.objects.all(), label='Producto')
@@ -58,9 +67,33 @@ class VentaForm(forms.Form):
         widget=forms.NumberInput(attrs={'min': '1', 'inputmode': 'numeric'}),
     )
 
-    rut_cliente = forms.CharField(max_length=12, required=True, label='RUT del cliente', widget=forms.TextInput(attrs={'placeholder': '12.345.678-9', 'autocomplete': 'off'}))
+    rut_cliente = forms.RegexField(
+        regex=r'^\d{1,10}-[\dKk]$',
+        max_length=12,
+        required=True,
+        label='RUT del cliente',
+        widget=forms.TextInput(attrs={
+            'placeholder': '12345678-9',
+            'autocomplete': 'off',
+            'pattern': r'[0-9]{1,10}-[0-9Kk]',
+        }),
+    )
+
+    def clean_nombre(self):
+        # La validación del servidor protege el flujo aunque se desactive la validación HTML.
+        nombre = self.cleaned_data['nombre'].strip()
+        if nombre and not all(parte.isalpha() for parte in nombre.split()):
+            raise forms.ValidationError('El nombre solo puede contener letras y espacios.')
+        return nombre
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data['telefono'].strip()
+        if telefono and not telefono.isdecimal():
+            raise forms.ValidationError('El teléfono solo puede contener números.')
+        return telefono
 
     def clean(self):
+        # Las reglas de stock se validan antes de guardar para evitar cantidades imposibles.
         cleaned_data = super().clean()
         producto = cleaned_data.get('producto')
         cantidad = cleaned_data.get('cantidad')
